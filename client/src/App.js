@@ -1,10 +1,15 @@
-import { useMutation, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
-import './App.css';
-import { CREATE_USER } from './mutations/users';
-import { GET_ALL_USERS, GET_ONE_USER } from './query/user';
+import React, {useEffect, useState} from 'react';
 
-function App() {
+import { useMutation, useQuery } from '@apollo/client';
+
+import { Button, Form } from 'react-bootstrap';
+
+import { GET_ALL_USERS, GET_ONE_USER } from './query/user';
+import { CREATE_USER } from './mutations/users';
+
+import './App.css';
+
+const App = () => {
   const {data, loading, error, refetch} = useQuery(GET_ALL_USERS, {pollInterval: 500});
   const {data: oneUser, loading: loadingOneUser} = useQuery(GET_ONE_USER, {
     variables: {
@@ -50,15 +55,26 @@ function App() {
 
   return (
     <div className="App">
-      <form>
-        <input value={username} onChange={e => setUsername(e.target.value)} type="text"/>
-        <input value={age} onChange={e => setAge(e.target.value)} type="number"/>
-          <div className="btns">
-            <button onClick={e => addUser(e)}>Create</button>
-            <button onClick={e => getAll(e)}>Get</button>
+      <Form className="formWrapper">
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label>Your name:</Form.Label>
+          <Form.Control
+            value={username}
+            type="text"
+            placeholder="Enter name"
+            onChange={e => setUsername(e.target.value)}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Label>Your age:</Form.Label>
+          <Form.Control value={age} type="number" placeholder="Enter age" onChange={e => setAge(e.target.value)} />
+        </Form.Group>
+          <div className="buttonsWrapper">
+            <Button variant="outline-dark" onClick={e => addUser(e)}>Create</Button>
+            <Button variant="outline-dark" onClick={e => getAll(e)}>Get</Button>
           </div>
-      </form>
-      <div>
+      </Form>
+      <div calssName="listWrapper">
         {users.map(user => 
           <div key={user.id} className="user">
             {user.id} {user.username} {user.age}
