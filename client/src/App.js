@@ -2,15 +2,53 @@ import React, {useEffect, useState} from 'react';
 
 import { useMutation, useQuery } from '@apollo/client';
 
-import { Button, Form } from 'react-bootstrap';
+import { ButtonGroup, Button, makeStyles, TextField, Box } from '@material-ui/core';
 
 import { GET_ALL_USERS, GET_ONE_USER } from './query/user';
 import { CREATE_USER } from './mutations/users';
 
-import './App.css';
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    maxWidth: 450
+  },
+  fieldWrapper: {
+    padding: 10
+  },
+  textFieldWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    margin: 20
+  },
+  wrapperAll: {
+    border: 'solid 1px black',
+    boxShadow: '4px 4px 8px 0px rgba(34, 60, 80, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonWrapper: {
+    paddingBottom: 20
+  },
+  userWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: 10,
+    padding: 10,
+    border: 'solid 1px black',
+    boxShadow: '4px 4px 8px 0px rgba(34, 60, 80, 0.2)'
+  }
+}));
 
 const App = () => {
-  const {data, loading, error, refetch} = useQuery(GET_ALL_USERS, {pollInterval: 500});
+  const classes = useStyles();
+  const {data, loading, refetch} = useQuery(GET_ALL_USERS);
   const {data: oneUser, loading: loadingOneUser} = useQuery(GET_ONE_USER, {
     variables: {
       id: 1
@@ -19,15 +57,14 @@ const App = () => {
   const [newUser] = useMutation(CREATE_USER);
   const [users, setUsers] = useState([]);
   const [username, setUsername] = useState('');
-  const [age, setAge] = useState(0);
-
-  console.log(oneUser);
+  const [age, setAge] = useState('');
+  
 
   useEffect(() => {
     if(!loading) {
       setUsers(data.getAllUsers)
     }
-  }, [data]);
+  }, [data, loading]);
 
   const addUser = e => {
     e.preventDefault()
@@ -54,31 +91,36 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      <Form className="formWrapper">
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Your name:</Form.Label>
-          <Form.Control
+    <div className={classes.root}>
+      <Box className={classes.wrapperAll}>
+        <form className={classes.textFieldWrapper} noValidate autoComplete="off">
+          <TextField
+            id="outlined-basic"
+            label="Your name:"
+            variant="outlined"
             value={username}
-            type="text"
-            placeholder="Enter name"
             onChange={e => setUsername(e.target.value)}
+            className={classes.fieldWrapper}
           />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Your age:</Form.Label>
-          <Form.Control value={age} type="number" placeholder="Enter age" onChange={e => setAge(e.target.value)} />
-        </Form.Group>
-          <div className="buttonsWrapper">
-            <Button variant="outline-dark" onClick={e => addUser(e)}>Create</Button>
-            <Button variant="outline-dark" onClick={e => getAll(e)}>Get</Button>
-          </div>
-      </Form>
-      <div calssName="listWrapper">
-        {users.map(user => 
-          <div key={user.id} className="user">
+          <TextField
+            id="outlined-basic"
+            label="Your age:"
+            variant="outlined"
+            value={age}
+            onChange={e => setAge(e.target.value)}
+            className={classes.fieldWrapper}
+          />
+        </form>
+        <ButtonGroup className={classes.buttonWrapper} size="large" color="primary" aria-label="large outlined primary button group">
+          <Button onClick={e => addUser(e)}>Create</Button>
+          <Button onClick={e => getAll(e)}>Get</Button>
+        </ButtonGroup>
+      </Box>
+      <div className="listWrapper">
+        {users.map(user =>
+          <div key={user.id} className={classes.userWrapper}>
             {user.id} {user.username} {user.age}
-          </div>  
+          </div>
         )}
       </div>
     </div>
